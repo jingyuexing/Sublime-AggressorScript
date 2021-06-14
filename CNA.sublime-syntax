@@ -27,7 +27,7 @@ variables:
     )
     )
   variabl_lang: |-
-    \b(?x:(
+    \b(?xi:(
       x86
       |active
       |beacons
@@ -69,7 +69,7 @@ variables:
       |sendmail_done
       |sendmail_post
       |sendmail_start
-      |ssh_(checkin|error|indicator|initial|input|output|output_alt|tasked)
+      |ssh_(checkin|error|indicator|initial|input|output|output_alt|tasked|output_downloads)
       |web_hit
       )
     )\b
@@ -200,7 +200,7 @@ contexts:
       scope: keyword.control.command.cna
     - match: \breport\b
       scope: keyword.other.cna
-    - match: \b(item|menu)\b
+    - match: \b(item|menu|popup)\b
       scope: keyword.other.cna
   language-buildin-variable:
     - match: ({{variabl_lang}})
