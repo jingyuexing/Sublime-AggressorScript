@@ -1,0 +1,27 @@
+# nieeee
+name()
+set SIGNED_APPLET_RESOURCE {
+    if ( -xname){
+
+    }
+    return script_resource("dist/applet_signed.jar --fname");
+}
+$name = "name";
+command ssh_sessions {
+    foreach $session(beacons()) {
+        if (-isssh $session['id']) {
+            println($session);
+        }
+    }
+}
+
+command beacons {
+    local('$entry $key $value');
+    foreach $entry (beacons()) {
+        println("== " . $entry['id'] . " ==");
+        foreach $key => $value ($entry) {
+            println("$[20]key : $value");
+        }
+        println();
+    }
+}

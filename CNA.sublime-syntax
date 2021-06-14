@@ -1,0 +1,207 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: CNA
+file_extensions:
+  - cna
+scope: source.cna
+variables:
+  variabl: (\$?[A-Za-z_]\w+)
+  hex_number: (0x[a-fA-F0-9]+)
+  number: \d+
+  constant: |-
+    (?x:(
+      EVENT_SBAR_LEFT
+      |EVENT_SBAR_RIGHT
+      |APPLET_SHELLCODE_FORMAT
+      |HTMLAPP_EXE
+      |HTMLAPP_POWERSHELL
+      |POWERSHELL_COMMAND
+      |POWERSHELL_DOWNLOAD_CRADLE
+      |PSEXEC_SERVICE
+      |PYTHON_COMPRESS
+      |SIGNED_APPLET_MAINCLASS
+      |SIGNED_APPLET_RESOURCE
+      |SMART_APPLET_MAINCLASS
+      |DATA_KEY
+    )
+    )
+  variabl_lang: |-
+    \b(?x:(
+      x86
+      |active
+      |beacons
+      |ssh_sessions
+      |beacon_checkin
+      |beacon_error
+      |beacon_indicator
+      |beacon_initial
+      |beacon_initial_empty
+      |beacon_input
+      |beacon_mode
+      |beacon_output
+      |beacon_output_alt
+      |beacon_output_jobs
+      |beacon_output_ls
+      |beacon_output_ps
+      |beacons
+      |event_action
+      |event_beacon_initial
+      |event_newsite
+      |event_notify
+      |event_nouser
+      |event_private
+      |event_public
+      |event_quit
+      |heartbeat_10m[ms]
+      |heartbeat_15[ms]
+      |heartbeat_1[ms]
+      |heartbeat_20m
+      |heartbeat_30m
+      |heartbeat_30s
+      |heartbeat_5m
+      |heartbeat_5s
+      |keylogger_hit
+      |keystrokes
+      |profiler_hit
+      |ready
+      |screenshots
+      |sendmail_done
+      |sendmail_post
+      |sendmail_start
+      |ssh_(checkin|error|indicator|initial|input|output|output_alt|tasked)
+      |web_hit
+      )
+    )\b
+  identifier: \b[[:alpha:]_][[:alnum:]_]*\b
+contexts:
+  main:
+    - include: base
+    - include: sections
+    - include: variable
+  base:
+    - include: comment
+    - include: string
+    - include: function
+    - include: number
+    - include: keyword
+    - include: constant
+    - include: operator
+    - include: language-buildin-variable
+
+  comment:
+    - match: (#)
+      scope: punctuation.definition.comment.cna
+      push:
+        - meta_scope: comment.line.number-sign.cna
+        - match: $
+          pop: true
+  sections:
+    - include: parens
+    - include: brackets
+  parens:
+    - match: \(
+      scope: punctuation.section.group.begin.cna
+      push:
+        - meta_scope: meta.group.cna
+        - match: \)
+          scope: punctuation.section.group.end.cna
+          pop: true
+        - include: base
+        - include: parens
+        - include: brackets
+  block:
+    - match: \{
+      scope: punctuation.section.block.begin.cna
+      push:
+        - meta_scope: meta.block.cna
+        - match: \}
+          scope: punctuation.section.block.end.cna
+          pop: true
+        - include: base
+        - include: sections
+  brackets:
+    - match: \[
+      scope: punctuation.section.brackets.begin.cna
+      push:
+        - meta_scope: meta.brackets.cna
+        - match: \]
+          scope: punctuation.section.brackets.end.cna
+          pop: true
+        - include: base
+        - include: parens
+        - include: brackets
+  string:
+    - match: (")
+      scope: punctuation.definition.string.begin.cna
+      push:
+        - meta_scope: string.quoted.double.cna
+        - match: (")
+          scope: punctuation.definition.string.end.cna
+          pop: true
+        - include: constant
+        - include: command-params
+        - include: variable
+    - match: (')
+      scope: punctuation.definition.string.begin.cna
+      push:
+        - meta_scope: string.quoted.single.cna
+        - match: (')
+          scope: punctuation.definition.string.end.cna
+          pop: true
+        - include: constant
+        - include: command-params
+        - include: variable
+  variable:
+    - match: (\$[[:alpha:]_][[:alnum:]_]*)
+      scope: variable.other.cna
+  operator:
+    - match: \+\=|-\=|\*\=|/\=|%\=|&\=|\|\=|\^\=|>>\=|<<\=
+      scope: keyword.operator.assignment.augmented.cna
+    - match: \=
+      scope: keyword.operator.assignment.cna
+    - match: "=>"
+      scope: keyword.operator.key.cna
+    - match: (\.)
+      scope: keyword.operator.assignment.augmented.cna
+  number:
+    - match: ({{hex_number}})
+      scope: constant.numeric.value.cna meta.number.integer.hexadecimal.cna
+    - match: ({{number}})
+      scope: constant.numeric.value.cna meta.number.integer.decimal.cna
+  constant:
+    - match: ({{constant}})
+      scope: constant.language.cna
+    - match: (T\d{4})
+      scope: constant.language.cna
+    - include: command-params
+
+  command-params:
+    - match: ((\-|\-\-){{variabl}})
+      scope: constant.language.cna
+  function:
+    - include: function-call
+  function-call:
+    - match: ({{variabl}})(\()
+      captures:
+        1: entity.name.function.cna meta.function-call.cna
+  keyword:
+    - match: \bon\b
+      scope: keyword.event.on.cna
+    - match: \bset\b
+      scope: keyword.context.cna
+    - match: \breturn\b
+      scope: keyword.control.flow.return.cna
+    - match: \bforeach\b
+      scope: keyword.control.loop.cna
+    - match: \bif\b
+      scope: keyword.control.if.cna
+    - match: \bcommand\b
+      scope: keyword.control.command.cna
+    - match: \breport\b
+      scope: keyword.other.cna
+    - match: \b(item|menu)\b
+      scope: keyword.other.cna
+  language-buildin-variable:
+    - match: ({{variabl_lang}})
+      scope: variable.language.cna
